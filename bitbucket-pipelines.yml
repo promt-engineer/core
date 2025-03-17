@@ -1,0 +1,32 @@
+image: atlassian/default-image:3
+
+definitions:
+  steps:
+    # Run linter (linters must run in every branch and pull request).
+    # Before pushing the code, you need to run golangci-lint on your local machine.
+    # - step: &lint
+    #     name: Lint
+    #     image: golangci/golangci-lint:latest
+    #     size: 2x
+    #     script:
+    #       - golangci-lint run -v --timeout 5m
+
+    - step: &build-and-push-prod
+        name: Build and push image prod
+        services:
+          - docker
+        script:
+          - export TAG=${BITBUCKET_TAG:-latest}
+          - export IMAGE=rg.fr-par.scw.cloud/18peaches-3/base-server:$TAG
+          - docker login rg.fr-par.scw.cloud/18peaches-3 -u nologin -p $SCW_SECRET_TOKEN_PROD
+          - docker build --build-arg TAG=$TAG --build-arg CHEATS=true --build-arg SSH_KEY="`cat /opt/atlassian/pipelines/agent/data/id_rsa`"   -t $IMAGE -f Dockerfile .
+          - docker push $IMAGE
+
+pipelines:
+  tags:
+    '*.*.*':
+      # - step: *lint
+      - step: *build-and-push-prod
+  branches:
+    '18peach/18-116':
+      - step: *build-and-push-prod

@@ -1,0 +1,305 @@
+syntax = "proto3";
+
+package history;
+
+option go_package = "./history";
+
+import "google/protobuf/timestamp.proto";
+
+service HistoryService {
+  rpc GetSpins (GetFinancialIn) returns (GetSpinsOut) {}
+  rpc GetSessions (GetFinancialIn) returns (GetSessionsOut) {}
+  rpc GetAllSpins(FinancialBase) returns (GetAllSpinsOut) {}
+  rpc GetAllGameSession(FinancialBase) returns (GetAllGameSessionsOut) {}
+  rpc GetFinancialReport(FinancialBase) returns (FinancialReportOut) {}
+  rpc GetAggregatedReportByGame(GetAggregatedReportFilters) returns (GetAggregatedReportByGameOut) {}
+  rpc GetAggregatedReportByCountry(GetAggregatedReportFilters) returns (GetAggregatedReportByCountryOut) {}
+  rpc GetSession(GetSessionIn) returns (GameSessionOut) {}
+
+  rpc GetHosts(FinancialBase) returns (DictionaryOut) {}
+  rpc GetCurrencies(FinancialBase) returns (DictionaryOut) {}
+  rpc GetIntegratorOperators(GamesIn) returns (IntegratorsOperatorOut) {}
+
+  // For Slot Engine
+  rpc CreateSpin(SpinIn) returns (Status) {}
+  rpc UpdateSpin(SpinIn) returns (Status) {}
+  rpc GetSpin(GetSpinIn) returns (GetSpinOut) {}
+  rpc GetLastSpin(GetLastSpinIn) returns (GetSpinOut) {}
+  rpc GetLastNotShownSpins(GetLastSpinIn) returns (GetLastSpinsOut) {}
+  rpc GetLastSpinByWager(GetLastSpinByWagerIn) returns (GetSpinOut) {}
+  rpc GetSpinsPagination(GetSpinPaginationIn) returns (GetSpinPaginationOut) {}
+
+  rpc HealthCheck (stream Status) returns (stream Status) {}
+}
+
+message GetSessionIn {
+  string session_id = 1;
+  repeated string games = 2;
+  string convertCurrency = 3;
+}
+
+message GetAggregatedReportFilters {
+  string convertCurrency = 1;
+  repeated string games = 2;
+  string integrator = 3;
+  string operator = 4;
+  optional google.protobuf.Timestamp starting_from = 5;
+  optional google.protobuf.Timestamp ending_at = 6;
+  optional bool is_pfr = 7;
+  optional bool is_demo = 8;
+}
+
+message GetAggregatedReportByGameOut {
+  repeated GetAggregatedReportByGameItem items = 1;
+}
+
+message GetAggregatedReportByCountryOut {
+  repeated GetAggregatedReportByCountryItem items = 1;
+}
+
+message GetAggregatedReportByGameItem {
+  string game = 1;
+  string game_id = 2;
+  string currency = 3;
+  int64 user_count = 4;
+  int64 round_count = 5;
+  double wager = 6;
+  double award = 7;
+}
+
+message  GetAggregatedReportByCountryItem {
+  string country = 1;
+  string currency = 2;
+  int64 user_count = 3;
+  int64 round_count = 4;
+  double wager = 5;
+  double award = 6;
+}
+
+message FinancialReport {
+  uint64 award = 1;
+  uint64 award_without_pfr = 2;
+  uint64 wager = 3;
+  uint64 wager_without_pfr = 4;
+  int64 spin_quantity = 5;
+  int64 user_quantity = 6;
+  uint64 revenue = 7;
+  uint64 rtp = 8;
+  uint64 rtp_with_turnover = 9;
+  uint64 margin = 10;
+  uint64 award_with_pfr = 11;
+  uint64 wager_with_pfr = 12;
+}
+
+message FinancialReportOut {
+  FinancialReport report = 1;
+}
+
+
+
+message GetAllGameSessionsOut {
+  repeated GameSessionOut sessions = 1;
+}
+
+message GetAllSpinsOut {
+  repeated SpinOut spins = 1;
+}
+
+message GetFinancialIn {
+  string order = 1;
+  uint64 page = 2;
+  uint64 limit = 3;
+  repeated string group_by = 4;
+  FinancialBase base = 6;
+}
+
+message FinancialBase {
+  string convertCurrency = 1;
+  repeated string games = 2;
+  Filters filters = 3;
+}
+
+message Filters {
+  string integrator = 1;
+  string operator = 2;
+  string game = 3;
+  optional google.protobuf.Timestamp starting_from = 4;
+  optional google.protobuf.Timestamp ending_at = 5;
+  string session_token = 6;
+  string round_id = 7;
+  string host = 8;
+  string external_user_id = 9;
+  optional bool is_demo = 10;
+}
+
+message GetSessionsOut {
+  repeated GameSessionOut items = 1;
+  uint64 current_page = 2;
+  uint64 limit = 3;
+  uint64 total = 4;
+}
+
+message GameSessionOut {
+  google.protobuf.Timestamp created_at = 1;
+  string session_token = 2;
+  string user_id = 3;
+  string external_user_id = 4;
+  uint64 wager = 5;
+  uint64 wager_without_pfr = 6;
+  uint64 award = 7;
+  uint64 award_without_pfr = 8;
+  string currency = 9;
+  string integrator = 10;
+  string operator = 11;
+  string game_id = 12;
+  string game = 13;
+  repeated SpinOut spins = 14;
+  uint64 wager_with_pfr = 15;
+  uint64 award_with_pfr = 16;
+  uint64 rtp = 17;
+  uint64 rtp_with_turnover = 18;
+  uint64 margin = 19;
+  uint64 revenue = 20;
+  uint64 start_balance = 21;
+  uint64 end_balance = 22;
+  uint64 base_award = 23;
+  uint64 bonus_award = 24;
+  uint64 final_award = 25;
+}
+
+message GetSpinsOut {
+  repeated SpinOut items = 1;
+  uint64 current_page = 2;
+  uint64 limit = 3;
+  uint64 total = 4;
+}
+
+message SpinIn {
+  google.protobuf.Timestamp created_at = 1;
+  google.protobuf.Timestamp updated_at = 2;
+
+  string host = 3;
+  string client_ip = 4;
+  string user_agent = 5;
+  bytes request = 6;
+
+  string id = 7;
+  string game_id = 8;
+  string game = 9;
+  string session_token = 10;
+  string transaction_id = 11;
+  string integrator = 12;
+  string operator = 13;
+  string provider = 14;
+
+  string internal_user_id = 15;
+  string external_user_id = 16;
+  string currency = 17;
+
+  uint64 start_balance = 18;
+  uint64 end_balance = 19;
+  uint64 wager = 20;
+  uint64 base_award = 21;
+  uint64 bonus_award = 22;
+  uint64 final_award = 23;
+
+  bytes restoring_indexes = 24;
+  bytes details = 25;
+
+  bool is_pfr = 26;
+  bool is_shown = 27;
+  optional bool is_demo = 28;
+}
+
+message SpinOut {
+  google.protobuf.Timestamp created_at = 1;
+  google.protobuf.Timestamp updated_at = 2;
+
+  string country = 3;
+  string host = 4;
+  string client_ip = 5;
+  string user_agent = 6;
+  bytes request = 7;
+
+  string id = 8;
+  string game_id = 9;
+  string game = 10;
+  string session_token = 11;
+  string transaction_id = 12;
+  string integrator = 13;
+  string operator = 14;
+  string provider = 15;
+
+  string internal_user_id = 16;
+  string external_user_id = 17;
+  string currency = 18;
+
+  uint64 start_balance = 19;
+  uint64 end_balance = 20;
+  uint64 wager = 21;
+  uint64 base_award = 22;
+  uint64 bonus_award = 23;
+  uint64 final_award = 24;
+
+  bytes restoring_indexes = 25;
+  bytes details = 26;
+
+  optional bool is_pfr = 27;
+  optional bool is_shown = 28;
+  optional bool is_demo = 29;
+
+}
+
+message GetSpinIn {
+  string round_id = 1;
+  string convertCurrency = 2;
+}
+
+message GetLastSpinIn {
+  string game = 1;
+  string internal_user_id = 2;
+}
+
+message GetLastSpinByWagerIn {
+  string game = 1;
+  string internal_user_id = 2;
+  uint64 wager = 3;
+}
+
+message GetSpinOut {
+  SpinOut item = 1;
+  bool isFound = 2;
+}
+
+message GetLastSpinsOut {
+  repeated SpinOut items = 1;
+}
+
+message GetSpinPaginationIn {
+  GetLastSpinIn filter = 1;
+  uint64 limit = 2;
+  uint64 page = 3;
+}
+
+message GetSpinPaginationOut {
+  repeated SpinOut items = 1;
+  uint64 page = 2;
+  uint64 limit = 3;
+  uint64 total = 4;
+}
+
+message DictionaryOut {
+  repeated string items = 1;
+}
+
+message GamesIn {
+  repeated string games = 1;
+}
+
+message IntegratorsOperatorOut {
+  map<string, DictionaryOut> map = 1;
+}
+
+message Status {
+  string status = 1;
+}

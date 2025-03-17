@@ -1,0 +1,10 @@
+defaultWager: 200
+defaultCurrency: XTS
+defaultJurisdiction: UA
+defaultUserLocale: da-DK
+masterGame: roulette
+reskinGame: roulette2
+integratorMock: mock
+
+host: 0.0.0.0
+port: 8086

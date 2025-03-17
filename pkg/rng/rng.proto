@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option go_package = "./rng";
+
+service RNG {
+  rpc Rand(RandRequest) returns (RandResponse) {}
+  rpc RandFloat(RandRequestFloat) returns (RandResponseFloat) {}
+  rpc HealthCheck (stream Status) returns (stream Status) {}
+}
+
+message Status {
+  string status = 1;
+}
+
+
+message RandRequest {
+  repeated uint64 max = 1;
+}
+
+message RandResponse {
+  repeated uint64 result = 1;
+}
+
+message RandRequestFloat {
+  uint64 max = 1;
+}
+
+message RandResponseFloat {
+  repeated double result = 1;
+}

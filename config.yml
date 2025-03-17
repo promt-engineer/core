@@ -1,0 +1,55 @@
+engine:
+  rtp: 94
+  volatility: medium
+  debug: true
+  isCheatsAvailable: false
+  mockRng: true
+
+server:
+  host: 0.0.0.0
+  port: 8089
+  readTimeout: 30s
+  writeTimeout: 30s
+  maxProcessingTime: 10000ms
+
+websocket:
+  maxProcessingTime: 10000ms
+  readBufferSize: 1024
+  writeBufferSize: 1024
+
+overlord:
+  host: 0.0.0.0
+  port: 7001
+  isSecure: false
+
+history:
+  host: 0.0.0.0
+  port: 7500
+  isSecure: false
+
+#historyMongoDB:
+#  url: mongodb://root:example@127.0.0.1:27017/
+#  name: base_slot
+
+rng:
+  host: 0.0.0.0
+  port: 7010
+  maxProcessingTime: 10000ms
+
+tracer:
+  url: http://0.0.0.0:14268/api/traces
+  serviceName: base-slot
+
+game:
+  availableGames:
+    - roulette
+    - roulette2
+
+# simulator:
+#   gameName: roulette
+#   reportPath: simulations
+#   spins: 1000000
+#   wager: 2000
+#   workers: 16
+#   generateParams: # all generate params must be in snake case style
+#     ante_bet: true

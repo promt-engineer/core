@@ -1,0 +1,49 @@
+engine:
+  rtp: 94
+  debug: true
+  isCheatsAvailable: false
+
+server:
+  host: 0.0.0.0
+  port: 8086
+  readTimeout: 30s
+  writeTimeout: 30s
+  maxProcessingTime: 10000 #ms
+
+websocket:
+  maxProcessingTime: 10000ms
+  readBufferSize: 1024
+  writeBufferSize: 1024
+
+#overlord:
+#  host: overlord
+#  port: 7001
+#  isSecure: false
+
+cryptolut:
+  baseURL:
+  withLogs: true
+
+#history:
+#  host: 0.0.0.0
+#  port: 7500
+#  isSecure: false
+
+historyMongoDB:
+  url: mongodb://root:example@127.0.0.1:27017/
+  name: base_slot
+
+rng:
+  host: rng
+  port: 7010
+  isSecure: false
+  maxProcessingTime: 10000ms
+
+tracer:
+  url: tracer:14268/api/traces
+  serviceName: base-slot
+
+game:
+  availableGames:
+    - roulette
+    - roulette2

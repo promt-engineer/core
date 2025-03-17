@@ -1,0 +1,293 @@
+syntax = "proto3";
+
+package overlord;
+
+option go_package = "./overlord";
+
+message Status {
+  string status = 1;
+}
+
+service Overlord {
+  rpc InitUserState(InitUserStateIn) returns (InitUserStateOut) {}
+  rpc GetStateBySessionToken(GetStateBySessionTokenIn) returns (InitUserStateOut) {}
+  rpc OpenBet(OpenBetIn) returns (OpenBetOut) {}
+  rpc OpenFreeBet(OpenFreeBetIn) returns (OpenBetOut) {}
+  rpc CloseBet(CloseBetIn) returns (CloseBetOut) {}
+  rpc RollbackBet(RollbackIn) returns (RollbackOut) {}
+  rpc AtomicBet(AtomicBetIn) returns(AtomicBetOut) {}
+
+  rpc GetAvailableCurrencies(GetAvailableCurrenciesIn) returns (GetAvailableCurrenciesOut) {}
+  rpc GetIntegratorConfig(GetIntegratorConfigIn) returns (GetIntegratorConfigOut) {}
+  rpc GetAvailableFreeBets(GetAvailableFreeBetsIn)  returns (GetAvailableFreeBetsOut) {}
+  rpc CancelAvailableFreeBets(CancelAvailableFreeBetsIn) returns (CancelAvailableFreeBetsOut) {}
+  rpc GetAvailableFreeBetsWithIntegratorBet(GetAvailableFreeBetsIn)  returns (GetAvailableFreeBetsWithIntegratorBetOut) {}
+  rpc CancelAvailableFreeBetsByIntegratorBet(CancelAvailableFreeBetsByIntegratorBetIn) returns (CancelAvailableFreeBetsOut) {}
+  rpc GetIntegratorFreeSpinsByID(GetIntegratorFreeSpinsByIDIn)  returns (GetAvailableFreeBetsOut) {}
+  rpc SaveDefaultWagerInFreeBetValue(SaveDefaultWagerInFreeBetValueIn) returns (SaveDefaultWagerInFreeBetValueOut) {}
+
+  rpc AddFreeBets(AddFreeBetIn) returns (AddFreeBetOut) {}
+  rpc CancelFreeBets(CancelFreeBetIn) returns (CancelFreeBetOut) {}
+
+  rpc SaveParams(SaveParamsIn) returns (SaveParamsOut) {}
+  rpc GetParams(GetParamsIn) returns (GetParamsOut) {}
+
+  rpc HealthCheck         (stream Status)           returns (stream Status) {}
+}
+
+message GetStateBySessionTokenIn{
+  string  session_token = 1;
+  int64   wager_levels_divisor = 2;
+}
+
+message InitUserStateIn{
+  string  integrator = 1;
+  string  game = 2;
+  bytes   params = 3;
+}
+
+message InitUserStateOut {
+  string              user_id = 1;
+  string              external_user_id = 2;
+  string              integrator = 3;
+  string              operator = 4;
+  string              provider = 5;
+  string              game = 6;
+  string              game_id = 7;
+  string              username = 8;
+  string              session_token = 9;
+  int64               balance = 10;
+  string              currency = 11;
+  repeated string     free_bets = 12;
+
+  int64               default_wager = 13;
+  int64               currency_multiplier = 14;
+  repeated int64      wager_levels = 15;
+
+  bool isDemo = 16;
+
+  bool   buy_bonus = 17;
+  bool   gamble = 18;
+  bool   double_chance = 19;
+  optional int64   rtp = 20;
+  optional string  volatility = 21;
+  repeated int64 available_rtp = 22;
+  repeated string available_volatility = 23;
+  bool online_volatility = 24;
+  string  user_locale = 25;
+  string  jurisdiction = 26;
+  string  lobby_url = 27;
+  bool    show_cheats = 28;
+  bool    low_balance  = 29;
+  bool    short_link  = 30;
+  int64 gamble_double_up = 31;
+  string currency_synonym = 32;
+  int64               min_wager = 33;
+}
+
+message OpenBetIn {
+  string  session_token = 1;
+  string  round_id = 2;
+  int64   wager = 3;
+  int64   award = 4;
+}
+
+message OpenFreeBetIn {
+  string  session_token = 1;
+  string  free_bet_id = 2;
+  string  round_id = 3;
+}
+
+message OpenBetOut {
+  string  transaction_id = 1;
+  int64   balance = 2;
+}
+
+message CloseBetIn {
+  string  transaction_id = 1;
+  int64   award = 2;
+}
+
+message RollbackIn {
+  string  transaction_id = 1;
+}
+
+message RollbackOut {
+  int64  balance = 1;
+}
+
+message CloseBetOut {
+  int64   balance = 1;
+}
+
+message AtomicBetIn {
+  string  session_token = 1;
+  string  free_bet_id = 2;
+  string  round_id = 3;
+  int64   wager = 4;
+  int64   award = 5;
+  bool    is_gamble = 6;
+}
+
+message AtomicBetOut {
+  string  transaction_id = 1;
+  int64   balance = 2;
+}
+
+message GetAvailableFreeBetsIn {
+  string  session_token = 1;
+}
+
+message GetAvailableFreeBetsOut {
+  repeated FreeBet  free_bets = 1;
+}
+message FreeBetList {
+  repeated FreeBet bets = 1;
+}
+
+message GetAvailableFreeBetsWithIntegratorBetOut {
+  map<string, FreeBetList> free_bets = 1;
+}
+
+message CancelAvailableFreeBetsIn {
+  string  session_token = 1;
+}
+
+message CancelAvailableFreeBetsByIntegratorBetIn {
+  string  session_token = 1;
+  string integrator_bet_id = 2;
+}
+
+message CancelAvailableFreeBetsOut {
+  string status = 1;
+}
+
+message GetAvailableCurrenciesIn {}
+
+message GetAvailableCurrenciesOut {
+  repeated string currencies = 1;
+}
+
+message FreeBet {
+  string  id = 1;
+  string  game = 2;
+  string  currency = 3;
+  int64   value = 4;
+  int32   spin_count = 5;
+  int64   expire_date = 6;
+  string  integrator_user_id = 7;
+}
+
+message AddFreeBetIn {
+  string user_id = 1;
+  int64 bet_value = 2;
+  int32 free_bets = 3;
+  string currency = 4;
+  int64 end_date = 5;
+  string free_bet_id = 6;
+  string game = 7;
+  string provider = 8;
+  string integrator_key = 9;
+  string secret_token = 10;
+
+  bytes additional_data = 11;
+}
+message AddFreeBetOut {
+  int32 code = 1;
+  string message = 2;
+  string currency = 3;
+  string user_id = 4;
+  int32 free_bets = 5;
+  int64 bet_value = 6;
+  int64 end_date = 7;
+  string free_bet_id = 8;
+  string game = 9;
+  string provider = 10;
+}
+message CancelFreeBetIn {
+  string free_bet_id = 1;
+  string user_id = 2;
+  string integrator_key = 3;
+  string secret_token = 4;
+  string provider = 5;
+}
+message CancelFreeBetOut {
+  int32 code = 1;
+  string message = 2;
+}
+
+message GetIntegratorConfigIn {
+  string integrator = 1;
+  string game = 2;
+}
+
+message GetIntegratorConfigOut {
+  int64 default_wager = 1;
+  repeated int64 wager_levels = 2;
+  map<string, int64> multipliers = 3;
+}
+
+message SaveParamsIn{
+  string  integrator = 1;
+  string  game = 2;
+  optional int64   rtp = 3;
+  repeated int64   wagers = 4;
+  bool   buy_bonus = 5;
+  bool   gamble = 6;
+  bool   double_chance = 7;
+  string session_id = 8;
+  optional string   volatility = 9;
+  bool   is_demo = 10;
+  string  currency = 11;
+  string user_id = 12;
+  string user_locale = 13;
+  optional int64   default_wager = 14;
+  string  jurisdiction = 15;
+  string  lobby_url = 16;
+  bool    show_cheats = 17;
+  bool    low_balance  = 18;
+  bool short_link = 19;
+}
+
+message SaveParamsOut{
+}
+
+message GetParamsIn{
+  string  integrator = 1;
+  string  game = 2;
+  string session_id = 3;
+}
+
+message GetParamsOut{
+  optional int64   rtp = 1;
+  repeated int64   wagers = 2;
+  bool   buy_bonus = 3;
+  bool   gamble = 4;
+  bool   double_chance = 5;
+  optional string   volatility = 6;
+  bool   is_demo = 7;
+  string  currency = 8;
+  string user_id = 9;
+  string user_locale = 10;
+  optional int64   default_wager = 11;
+  string  jurisdiction = 12;
+  string  lobby_url = 13;
+  bool    show_cheats = 14;
+  bool    low_balance  = 15;
+  bool short_link = 16;
+}
+
+message GetIntegratorFreeSpinsByIDIn {
+  string  integrator = 1;
+  string  free_spin_id = 2;
+}
+
+message SaveDefaultWagerInFreeBetValueIn {
+  string  session_token = 1;
+  string  id = 2;
+  int64   value = 3;
+}
+
+message SaveDefaultWagerInFreeBetValueOut {
+  string  status = 1;
+}
